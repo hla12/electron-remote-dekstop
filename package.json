@@ -1,0 +1,24 @@
+{
+  "name": "remote-desktop",
+  "version": "1.0.0",
+  "description": "Local network screen sharing application",
+  "main": "app.js",
+  "scripts": {
+    "start": "electron .",
+    "host": "electron .",
+    "viewer": "electron . --viewer"
+  },
+  "keywords": [
+    "electron",
+    "screen-share",
+    "websockets"
+  ],
+  "author": "hla12",
+  "license": "ISC",
+  "dependencies": {
+    "ws": "^8.11.0"
+  },
+  "devDependencies": {
+    "electron": "^25.2.0"
+  }
+}
