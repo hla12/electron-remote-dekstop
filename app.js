@@ -1,5 +1,10 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain, desktopCapturer } = require('electron');
 const path = require('path');
+
+// Handle the request for screen sources from the renderer process
+ipcMain.handle('get-screen-sources', async () => {
+  return await desktopCapturer.getSources({ types: ['screen'] });
+});
 
 function createWindow() {
   const win = new BrowserWindow({

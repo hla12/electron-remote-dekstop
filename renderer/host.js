@@ -1,4 +1,4 @@
-const { desktopCapturer } = require('electron');
+const { ipcRenderer } = require('electron');
 const WebSocket = require('ws');
 const os = require('os');
 
@@ -61,7 +61,8 @@ async function startScreenStreaming() {
   }
 
   try {
-    const sources = await desktopCapturer.getSources({ types: ['screen'] });
+    // Ask the main process for the screen sources
+    const sources = await ipcRenderer.invoke('get-screen-sources');
     if (sources.length === 0) {
       console.error('No screen sources found.');
       return;
