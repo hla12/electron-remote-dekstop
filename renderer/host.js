@@ -78,26 +78,33 @@ async function startScreenStreaming() {
 
     const video = document.createElement('video');
     video.srcObject = stream;
-    video.onloadedmetadata = () => video.play();
-
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
 
     if (streamInterval) {
       clearInterval(streamInterval);
     }
 
-    streamInterval = setInterval(() => {
-      if (viewerSocket && viewerSocket.readyState === WebSocket.OPEN) {
-        ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
-        const imageData = canvas.toDataURL('image/jpeg', 0.5);
-        viewerSocket.send(imageData);
-      } else {
-        clearInterval(streamInterval);
-        streamInterval = null;
-        stream.getTracks().forEach(track => track.stop());
-      }
-    }, 100); // ~10 FPS
+    video.onloadedmetadata = () => {
+      video.play();
+
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+
+      // Start sending frames only after video metadata is loaded
+      streamInterval = setInterval(() => {
+        if (viewerSocket && viewerSocket.readyState === WebSocket.OPEN) {
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          const imageData = canvas.toDataURL('image/jpeg', 0.5);
+          viewerSocket.send(imageData);
+        } else {
+          // If socket is closed, stop everything
+          clearInterval(streamInterval);
+          streamInterval = null;
+          stream.getTracks().forEach(track => track.stop());
+        }
+      }, 100); // ~10 FPS
+    };
   } catch (e) {
     console.error('Error starting screen streaming:', e);
   }
